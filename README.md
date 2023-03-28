@@ -121,7 +121,7 @@ brew install koekeishiya/formulae/skhd
 # Clone The Config:
 
 ```
-TODO: ADD THE PROJECT
+git@github.com:Chris-AM/.config.git
 ```
 
 # After Clone:
