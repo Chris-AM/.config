@@ -92,6 +92,14 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 brew install ripgrep
 ```
 
+## Install Flutter
+
+<p align="center">
+  <a href="https://docs.flutter.dev/get-started/install/macos" target="blank"><img src="https://docs.flutter.dev/assets/images/shared/brand/flutter/logo/flutter-lockup.png" width="200" alt="Flutter logo" /></a>
+</p>
+
+- Follow The Official Flutter [macOS install](https://docs.flutter.dev/get-started/install/macos)
+
 ## Install and configure Yabai
 
 <p align="center">
