@@ -175,3 +175,34 @@ git clone https://github.com/github/copilot.vim.git \
 ```
 
 - Start Neovim and invoke `:Copilot setup.`
+
+## Install tmux
+
+<p align="center">
+  <a href="https://github.com/tmux/tmux/wiki" target="blank"><img src="https://raw.githubusercontent.com/tmux/tmux/master/logo/tmux-logo-medium.png" width="200" alt="Flutter logo" /></a>
+</p>
+
+1. Install tmux:
+
+```
+brew install tmux
+```
+
+2. Install tmux Plugins:
+
+```
+git clone https://github.com/tmux/tmux/wiki
+```
+
+3. Symbolic `.tmux.conf`
+
+```
+ln -s ~/.config/.tmux.conf ~/.tmux.conf
+```
+
+4. Create a session with:
+
+```
+tmux new -s [session_name]
+
+```
