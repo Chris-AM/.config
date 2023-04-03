@@ -11,3 +11,6 @@ nvim/pack/
 # iterm2
 iterm2/
 
+# Auto Generated Files
+*.DS_Store
+nvim/plugin/packer_compiled.lua
