@@ -1,0 +1,9 @@
+[user]
+	name = Chris-AM
+	email = c.aranguizm@outlook.com
+
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+
+[init]
+	defaultBranch = master
