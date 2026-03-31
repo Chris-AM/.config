@@ -28,7 +28,11 @@ return {
   {
     "rebelot/kanagawa.nvim",
     name = "kanagawa",
+    lazy = false,
     priority = 1000,
+    opts = {
+      transparent = true,
+    },
   },
   {
     "xiyaowong/transparent.nvim",
