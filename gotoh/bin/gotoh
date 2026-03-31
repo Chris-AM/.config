@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+"""
+gotoh — Copiloto técnico personal.
+Detecta el contexto del proyecto actual y lanza claude con el contexto de Notion inyectado.
+"""
+
+import json
+import os
+import sys
+from pathlib import Path
+from urllib.request import Request, urlopen
+from urllib.error import URLError
+
+NOTION_TOKEN = os.environ.get("NOTION_TOKEN", "")
+NOTION_VERSION = "2022-06-28"
+NOTION_BASE = "https://api.notion.com/v1"
+CLAUDE_MD = Path("CLAUDE.md")
+
+
+# ── Notion helpers ────────────────────────────────────────────────────────────
+
+def _headers():
+    return {
+        "Authorization": f"Bearer {NOTION_TOKEN}",
+        "Notion-Version": NOTION_VERSION,
+        "Content-Type": "application/json",
+    }
+
+
+def _request(method, path, body=None):
+    url = f"{NOTION_BASE}{path}"
+    data = json.dumps(body).encode() if body else None
+    req = Request(url, data=data, headers=_headers(), method=method)
+    try:
+        with urlopen(req, timeout=10) as resp:
+            return json.loads(resp.read())
+    except URLError as e:
+        print(f"gotoh: error de red — {e}")
+        return {}
+
+
+def search_pages(query):
+    result = _request("POST", "/search", {
+        "query": query,
+        "filter": {"property": "object", "value": "page"},
+    })
+    return result.get("results", [])
+
+
+def get_page_title(page):
+    props = page.get("properties", {})
+    for key in ("title", "Name", "Nombre", "Título"):
+        if key in props:
+            rich = props[key].get("title", [])
+            if rich:
+                return "".join(t.get("plain_text", "") for t in rich)
+    return ""
+
+
+def get_blocks(page_id):
+    result = _request("GET", f"/blocks/{page_id}/children")
+    return result.get("results", [])
+
+
+def block_to_text(block):
+    btype = block.get("type", "")
+    content = block.get(btype, {})
+    rich = content.get("rich_text", [])
+    text = "".join(t.get("plain_text", "") for t in rich)
+    if not text:
+        return None
+    prefixes = {
+        "heading_1": "# ",
+        "heading_2": "## ",
+        "heading_3": "### ",
+        "bulleted_list_item": "- ",
+        "numbered_list_item": "- ",
+        "to_do": "- [ ] ",
+    }
+    return prefixes.get(btype, "") + text
+
+
+def build_context(page, blocks):
+    title = get_page_title(page)
+    url = page.get("url", "")
+    lines = [
+        f"# Contexto Notion: {title}",
+        f"URL: {url}",
+        "",
+    ]
+    for block in blocks:
+        text = block_to_text(block)
+        if text:
+            lines.append(text)
+    return "\n".join(lines)
+
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+def launch_claude():
+    os.execvp("claude", ["claude"])
+
+
+def ask(question):
+    try:
+        return input(question).strip().lower()
+    except (KeyboardInterrupt, EOFError):
+        print()
+        return "n"
+
+
+def main():
+    # 1. El proyecto ya tiene CLAUDE.md → lanzar directo
+    if CLAUDE_MD.exists():
+        launch_claude()
+        return
+
+    # 2. Sin token → advertir y lanzar igual
+    if not NOTION_TOKEN:
+        print("gotoh: NOTION_TOKEN no definido. Lanzando sin contexto.")
+        launch_claude()
+        return
+
+    # 3. Buscar en Notion por nombre de directorio
+    dir_name = Path.cwd().name
+    print(f"gotoh: buscando «{dir_name}» en Notion...")
+
+    pages = search_pages(dir_name)
+    match = next(
+        (p for p in pages if get_page_title(p).lower() == dir_name.lower()),
+        None,
+    )
+
+    # 4. No encontrado → preguntar
+    if not match:
+        answer = ask(f"gotoh: «{dir_name}» no está trackeado en Notion. ¿Continuar sin contexto? [s/n] ")
+        launch_claude()
+        return
+
+    # 5. Encontrado → inyectar contexto en CLAUDE.md y lanzar
+    page_id = match["id"]
+    blocks = get_blocks(page_id)
+    context = build_context(match, blocks)
+
+    CLAUDE_MD.write_text(context + "\n")
+    print(f"gotoh: contexto cargado desde Notion → CLAUDE.md generado.")
+    launch_claude()
+
+
+if __name__ == "__main__":
+    main()

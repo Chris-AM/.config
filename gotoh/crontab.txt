@@ -1,0 +1,9 @@
+# Gotoh — Email processor (08:23, 20:23)
+23 8,20 * * * cd /Users/[username]/portfolio/personal_agent && /opt/homebrew/bin/uv run python -m scripts.email_processor >> output/email_processor.log 2>&1
+
+# Gotoh — Exercise breaks (10:00, 11:30, 13:00, 14:30, 16:00, 17:30, 19:00)
+0 10,13,16,19 * * * cd /Users/[username]/portfolio/personal_agent && /opt/homebrew/bin/uv run python -m scripts.exercise >> output/exercise.log 2>&1
+30 11,14,17 * * * cd /Users/[username]/portfolio/personal_agent && /opt/homebrew/bin/uv run python -m scripts.exercise >> output/exercise.log 2>&1
+
+# Gotoh — Haircut scheduler (1st of every month at 9:00)
+0 9 1 * * cd /Users/[username]/portfolio/personal_agent && /opt/homebrew/bin/uv run python -m scripts.haircut 2 >> output/haircut.log 2>&1
