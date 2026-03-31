@@ -14,3 +14,12 @@ iterm2/
 # Auto Generated Files
 *.DS_Store
 nvim/plugin/packer_compiled.lua
+
+# Gotoh — nunca trackear credenciales
+gotoh/secrets
+
+# Directorios de herramientas (auto-generados)
+configstore/
+yarn/
+gh/
+neonctl/
