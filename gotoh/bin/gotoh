@@ -109,6 +109,16 @@ def ask(question):
         return "n"
 
 
+def load_gotoh_config():
+    config_file = Path(".gotoh")
+    if config_file.exists():
+        try:
+            return json.loads(config_file.read_text())
+        except (json.JSONDecodeError, OSError):
+            print("gotoh: .gotoh inválido, ignorando.")
+    return {}
+
+
 def main():
     # 1. El proyecto ya tiene CLAUDE.md → lanzar directo
     if CLAUDE_MD.exists():
@@ -121,8 +131,9 @@ def main():
         launch_claude()
         return
 
-    # 3. Buscar en Notion por nombre de directorio
-    dir_name = Path.cwd().name
+    # 3. Usar nombre de página desde .gotoh si existe, si no el nombre del directorio
+    config = load_gotoh_config()
+    dir_name = config.get("notion_page") or Path.cwd().name
     print(f"gotoh: buscando «{dir_name}» en Notion...")
 
     pages = search_pages(dir_name)
