@@ -26,5 +26,3 @@ neonctl/
 cagent/
 ponytail/
 
-# Lockfiles (auto-generados)
-*-lock.json
