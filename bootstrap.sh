@@ -3,7 +3,6 @@
 # Correr después de clonar ~/.config desde GitHub.
 set -e
 
-USERNAME=$(whoami)
 PORTFOLIO="$HOME/portfolio"
 
 echo "==> Homebrew"
@@ -45,12 +44,6 @@ echo "==> portfolio"
 mkdir -p "$PORTFOLIO"
 [[ -d "$PORTFOLIO/personal_agent" ]] || \
   git clone git@github.com:Chris-AM/Gotoh.git "$PORTFOLIO/personal_agent"
-
-echo "==> crontab"
-CRON_TMP=$(mktemp)
-sed "s/\[username\]/$USERNAME/g" "$HOME/.config/gotoh/crontab.txt" > "$CRON_TMP"
-crontab "$CRON_TMP"
-rm "$CRON_TMP"
 
 echo "==> Claude Code settings"
 mkdir -p "$HOME/.claude"
